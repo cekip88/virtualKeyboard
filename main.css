@@ -44,7 +44,7 @@ textarea{
 .row:last-child{
     margin-bottom: 0;
 }
-.row:last-child button:last-child{
+.row:last-child button:nth-child(2){
     width: 200px;
 }
 button{

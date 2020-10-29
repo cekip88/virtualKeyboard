@@ -55,7 +55,9 @@ class Keyboard {constructor() {const _ = this;
             'Period': {key: ".", 'shift': '>', ruKey: 'ю'},
             'Slash': {key: "/", 'shift': '?', ruKey: '.', 'ruShift': ','},
             'Lang': {key: "Ru", ruKey: 'En'},
-            'Space': {key: " "}
+            'Space': {key: " "},
+            'ArrowLeft': {key: "<"},
+            'ArrowRight': {key: ">"}
     };
         _.init();
     }
@@ -69,13 +71,17 @@ class Keyboard {constructor() {const _ = this;
             },250)
         }
     }
-    buttonAction(code){
+    buttonAction(code) {
         const _ = this;
         let button = _.buttons[code];
         if (!button) return;
         let key = button.key;
 
-        if (key === 'Bsp'){
+        if (code === 'ArrowLeft') {
+
+        } else if (code === 'ArrowRight') {
+
+        } else if (key === 'Bsp'){
             _.area.value = _.area.value.substring(0,_.area.value.length - 1);
         } else if (key === 'Ru') {
             _.lang === 'en' ? _.lang = 'ru' : _.lang = 'en';
@@ -99,7 +105,7 @@ class Keyboard {constructor() {const _ = this;
             symbol = (_.shift || _.caps) ? symbol.toUpperCase() : symbol;
             _.area.value += symbol;
         }
-
+        _.area.focus();
         _.k_key_light(code);
     }
     keyBoardHandlers(){
