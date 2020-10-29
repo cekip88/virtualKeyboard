@@ -59,6 +59,11 @@ button{
 button:hover{
     cursor: pointer;
 }
+button.active{
+    background-color: #fff;
+    color: #33675d;
+}
+
 
 @media screen and (min-width: 768px){
     main{
