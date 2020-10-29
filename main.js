@@ -54,6 +54,7 @@ class Keyboard {constructor() {const _ = this;
             'Comma': {key: ",", 'shift': '<', ruKey: 'б'},
             'Period': {key: ".", 'shift': '>', ruKey: 'ю'},
             'Slash': {key: "/", 'shift': '?', ruKey: '.', 'ruShift': ','},
+            'Lang': {key: "Ru", ruKey: 'En'},
             'Space': {key: " "}
     };
         _.init();
@@ -61,7 +62,7 @@ class Keyboard {constructor() {const _ = this;
 
     k_key_light(code){
         let btn = document.querySelector(`.${code}`);
-        if (btn && !btn.classList.contains('ShiftLeft') && !btn.classList.contains('CapsLock')){
+        if (btn && !btn.classList.contains('ShiftLeft') && !btn.classList.contains('CapsLock') && !btn.classList.contains('Lang')){
             if (!btn.classList.contains('active')) btn.classList.add('active');
             setTimeout(function () {
                 btn.classList.remove('active')
@@ -76,12 +77,23 @@ class Keyboard {constructor() {const _ = this;
 
         if (key === 'Bsp'){
             _.area.value = _.area.value.substring(0,_.area.value.length - 1);
+        } else if (key === 'Ru') {
+            _.lang === 'en' ? _.lang = 'ru' : _.lang = 'en';
+            document.querySelector(`.Lang`).classList.toggle('active');
         } else if (key === 'Shift'){
             _.shift = !_.shift;
             document.querySelector(`.${code}`).classList.toggle('active');
         } else if (key === 'Caps'){
             _.caps = !_.caps;
             document.querySelector(`.${code}`).classList.toggle('active');
+        } else if (key === 'Enter') {
+            let symbol = `\n`;
+            _.area.value += symbol;
+        } else if (_.lang === 'ru') {
+            let symbol = button.ruKey ? button.ruKey : button.key;
+            if (_.shift && button.ruShift) symbol = button.ruShift;
+            else if (_.shift && button.shift) symbol = button.shift;
+            _.area.value += symbol;
         } else {
             let symbol = (_.shift && button.shift) ? button.shift : key;
             symbol = (_.shift || _.caps) ? symbol.toUpperCase() : symbol;
@@ -112,7 +124,7 @@ class Keyboard {constructor() {const _ = this;
         let i = 0;
         for (let code in _.buttons){
             let button = document.createElement('BUTTON');
-            button.setAttribute('class', code);
+            button.className = code;
             button.textContent = _.buttons[code]['key'];
             let rows = document.querySelectorAll('.row');
             if(i < 13) rows[0].append(button);
