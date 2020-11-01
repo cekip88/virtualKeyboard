@@ -27,7 +27,7 @@ class Keyboard {constructor() {const _ = this;
             'KeyI': {key: "i", ruKey: 'ш'},
             'KeyO': {key: "o", ruKey: 'щ'},
             'KeyP': {key: "p", ruKey: 'з'},
-            'BracketLeft': {key: "[", 'shift': ': {', ruKey: 'х'},
+            'BracketLeft': {key: "[", 'shift': '{', ruKey: 'х'},
             'BracketRight': {key: "]", 'shift': '}', ruKey: 'ъ'},
             'Backspace': {key: "Bsp"},
             'CapsLock': {key: "Caps"},
@@ -64,7 +64,7 @@ class Keyboard {constructor() {const _ = this;
 
     k_key_light(code){
         let btn = document.querySelector(`.${code}`);
-        if (btn && !btn.classList.contains('ShiftLeft') && !btn.classList.contains('CapsLock') && !btn.classList.contains('Lang')){
+        if (btn && !btn.classList.contains('ShiftLeft') && !btn.classList.contains('CapsLock')){
             if (!btn.classList.contains('active')) btn.classList.add('active');
             setTimeout(function () {
                 btn.classList.remove('active')
@@ -82,10 +82,12 @@ class Keyboard {constructor() {const _ = this;
         } else if (code === 'ArrowRight') {
 
         } else if (key === 'Bsp'){
-            _.area.value = _.area.value.substring(0,_.area.value.length - 1);
+            let arr = [_.area.value.substring(0,_.position),_.area.value.substring(_.position)];
+            arr[0] = arr[0].substr(0,arr[0].length - 1);
+            _.area.value = arr[0] + arr[1];
         } else if (key === 'Ru') {
             _.lang === 'en' ? _.lang = 'ru' : _.lang = 'en';
-            document.querySelector(`.Lang`).classList.toggle('active');
+            _.k_key_light('Lang')
         } else if (key === 'Shift'){
             _.shift = !_.shift;
             document.querySelector(`.${code}`).classList.toggle('active');
@@ -107,22 +109,85 @@ class Keyboard {constructor() {const _ = this;
         }
         _.area.focus();
         _.k_key_light(code);
+
+        document.querySelectorAll('.keyboard button').forEach(function (el) {
+            let name = el.className.split(' ')[0];
+            if (key === 'Ru'){
+                if (_.lang === 'ru'){
+                    if (_.buttons[name].ruKey) el.textContent = _.buttons[name].ruKey;
+                    if (_.caps || _.shift) el.textContent = el.textContent.toUpperCase();
+                    if (_.shift && _.buttons[name].ruShift) el.textContent = _.buttons[name].ruShift
+                } else {
+                    el.textContent = _.buttons[name].key;
+                    if (_.caps || _.shift) el.textContent = el.textContent.toUpperCase();
+                    if (_.shift && _.buttons[name].shift) el.textContent = _.buttons[name].shift
+                }
+            }
+            if (key === 'Shift'){
+                if (_.shift){
+                    if (_.lang === 'en' && _.buttons[name].shift){
+                        el.textContent = _.buttons[name].shift
+                    } else if (_.lang === 'ru' && _.buttons[name].ruShift){
+                        el.textContent = _.buttons[name].ruShift
+                    }
+                } else {
+                    if (_.lang === 'en'){
+                        el.textContent = _.buttons[name].key;
+                    } else if (_.lang === 'ru'){
+                        el.textContent = _.buttons[name].ruKey ? _.buttons[name].ruKey : _.buttons[name].key;
+                    }
+                }
+            }
+            if (key === 'Caps' || key === 'Shift'){
+                if (_.caps || _.shift){
+                    el.textContent = el.textContent.toUpperCase();
+                } else el.textContent = el.textContent.toLowerCase();
+            }
+        })
     }
     keyBoardHandlers(){
         const _ = this;
+        document.querySelector("#input").addEventListener('click',function (e) {
+            _.getPosition();
+        });
         document.querySelectorAll('.keyboard button').forEach(function (button) {
             button.addEventListener('click',function (e) {
                 let code = button.className;
                 code = code.split(' ')[0];
                 _.buttonAction(code);
+                _.getPosition();
             });
         });
         _.area.addEventListener('keydown',function (e) {
             if (_.buttons[e.code]) e.preventDefault();
             _.buttonAction(e.code);
+            _.getPosition();
         });
     }
 
+
+    getCaretPos(input){
+        input.focus();
+
+        if(input.selectionStart) return input.selectionStart;
+        else if (document.selection){
+            let sel = document.selection.createRange();
+            let clone = sel.duplicate();
+            sel.collapse(true);
+            clone.moveToElementText(input);
+            clone.setEndPoint('EndToEnd', sel);
+            return clone.text.length;
+        }
+
+        return 0;
+    }
+    getPosition() {
+        const _ = this;
+        _.position = _.getCaretPos(document.getElementById('input'));
+        setTimeout(function (e) {
+            _.getPosition();
+        }, 100);
+    }
 
 
     createButtons(){
@@ -158,3 +223,7 @@ class Keyboard {constructor() {const _ = this;
 }
 
 let keyboard = new Keyboard();
+
+
+
+
