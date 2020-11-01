@@ -60,6 +60,9 @@ class Keyboard {constructor() {const _ = this;
             'ArrowLeft': {key: "<"},
             'ArrowRight': {key: ">"}
     };
+        document.querySelector('.hide').addEventListener('click',function (e) {
+            _.keyboardHide()
+        });
         _.init();
     }
 
@@ -100,8 +103,8 @@ class Keyboard {constructor() {const _ = this;
                 _.area.value = strArr[0] + strArr[2];
             } else {
                 _.area.value = strArr[0].substr(0,strArr[0].length - 1) + strArr[2];
+                _.position[0] > 0 ? _.position[0]-- : '';
             }
-            _.position[0] > 0 ? _.position[0]-- : '';
             _.area.setSelectionRange(_.position[0],_.position[0]);
 
         } else if (key === 'En') {
@@ -143,7 +146,6 @@ class Keyboard {constructor() {const _ = this;
 
         }
 
-        console.log('test');
         _.area.focus();
         _.k_key_light(code);
         _.keyBoardButtonsRename(key);
@@ -221,9 +223,24 @@ class Keyboard {constructor() {const _ = this;
     getPosition() {
         const _ = this;
         let input = document.getElementById('input');
-        input.focus();
         _.position[0] = input.selectionStart;
         _.position[1] = input.selectionEnd;
+    }
+    keyboardHide(){
+        const _ = this;
+        if (!_.body.classList.contains('hidden')){
+            _.body.classList.add('hidden');
+            document.querySelector('.hide').textContent = 'Show keyboard';
+            setTimeout(function (e) {
+                _.body.setAttribute('style','display:none');
+            },350)
+        } else {
+            _.body.setAttribute('style','');
+            setTimeout(function () {
+                _.body.classList.remove('hidden');
+            },10);
+            document.querySelector('.hide').textContent = 'Hide keyboard';
+        }
     }
 
     createButtons(){

@@ -19,7 +19,7 @@ main{
 textarea{
     width: 80%;
     max-width: 900px;
-    height: calc(100vh - 250px);
+    height: calc(100vh - 300px);
     display: block;
     margin: 0 auto;
     padding: 10px;
@@ -29,9 +29,16 @@ textarea{
 .keyboard{
     width: 100%;
     max-width: 900px;
-    margin: 20px auto 0;
+    margin: 0 auto;
     padding: 20px 0;
     background-color: #004134;
+    transition: .35s ease;
+    overflow: hidden;
+    position: fixed;
+    bottom: 50px;
+    left: 0;
+    right: 0;
+    transform: scaleY(1);
 }
 .row,button{
     display: flex;
@@ -67,7 +74,15 @@ button.active{
     color: #33675d;
 }
 
-
+.hide{
+    border-radius: 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+.hidden{
+    transform: scaleY(0);
+}
 @media screen and (min-width: 768px){
     main{
         display: flex;
