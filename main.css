@@ -48,13 +48,16 @@ textarea{
     width: 200px;
 }
 button{
-    width: 5.5%;
+    min-width: 5.5%;
     height: 30px;
     margin: 0 2px;
     background-color: #33675d;
     border-radius: 3px;
     color: #fff;
-    font-size: 12px;
+    font-size: 14px;
+}
+.ShiftLeft,.CapsLock,.Enter,.Backspace{
+    padding: 0 5px;
 }
 button:hover{
     cursor: pointer;

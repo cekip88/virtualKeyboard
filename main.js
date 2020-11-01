@@ -1,6 +1,7 @@
 class Keyboard {constructor() {const _ = this;
         _.body = document.querySelector('.keyboard');
         _.area = document.querySelector('#input');
+        _.position = [];
         _.lang = 'en';
         _.shift = false;
         _.caps = false;
@@ -29,8 +30,8 @@ class Keyboard {constructor() {const _ = this;
             'KeyP': {key: "p", ruKey: 'з'},
             'BracketLeft': {key: "[", 'shift': '{', ruKey: 'х'},
             'BracketRight': {key: "]", 'shift': '}', ruKey: 'ъ'},
-            'Backspace': {key: "Bsp"},
-            'CapsLock': {key: "Caps"},
+            'Backspace': {key: "Bsp", appointment: 'function'},
+            'CapsLock': {key: "Caps", appointment: 'function'},
             'KeyA': {key: "a", ruKey: 'ф'},
             'KeyS': {key: "s", ruKey: 'ы'},
             'KeyD': {key: "d", ruKey: 'в'},
@@ -42,8 +43,8 @@ class Keyboard {constructor() {const _ = this;
             'KeyL': {key: "l", ruKey: 'д'},
             'Semicolon': {key: ";", 'shift': ':', ruKey: 'ж'},
             'Quote': {key: "'", 'shift': '"', ruKey: 'э'},
-            'Enter': {key: "Enter"},
-            'ShiftLeft': {key: "Shift"},
+            'Enter': {key: "Enter", appointment: 'function'},
+            'ShiftLeft': {key: "Shift", appointment: 'function'},
             'KeyZ': {key: "z", ruKey: 'я'},
             'KeyX': {key: "x", ruKey: 'ч'},
             'KeyC': {key: "c", ruKey: 'с'},
@@ -54,7 +55,7 @@ class Keyboard {constructor() {const _ = this;
             'Comma': {key: ",", 'shift': '<', ruKey: 'б'},
             'Period': {key: ".", 'shift': '>', ruKey: 'ю'},
             'Slash': {key: "/", 'shift': '?', ruKey: '.', 'ruShift': ','},
-            'Lang': {key: "Ru", ruKey: 'En'},
+            'Lang': {key: "En", ruKey: 'Ру', appointment: 'function'},
             'Space': {key: " "},
             'ArrowLeft': {key: "<"},
             'ArrowRight': {key: ">"}
@@ -77,58 +78,105 @@ class Keyboard {constructor() {const _ = this;
         if (!button) return;
         let key = button.key;
 
+        let strArr = [
+            _.area.value.substring(0,_.position[0]),
+            _.area.value.substring(_.position[0],_.position[1]),
+            _.area.value.substring(_.position[1],_.area.value.length),
+        ];
+
         if (code === 'ArrowLeft') {
+
+            _.position[0]--;
+            _.area.setSelectionRange(_.position[0],_.position[0])
 
         } else if (code === 'ArrowRight') {
 
+            _.position[0]++;
+            _.area.setSelectionRange(_.position[0],_.position[0])
+
         } else if (key === 'Bsp'){
-            let arr = [_.area.value.substring(0,_.position),_.area.value.substring(_.position)];
-            arr[0] = arr[0].substr(0,arr[0].length - 1);
-            _.area.value = arr[0] + arr[1];
-        } else if (key === 'Ru') {
+
+            if (strArr[1].length > 0){
+                _.area.value = strArr[0] + strArr[2];
+            } else {
+                _.area.value = strArr[0].substr(0,strArr[0].length - 1) + strArr[2];
+            }
+            _.position[0] > 0 ? _.position[0]-- : '';
+            _.area.setSelectionRange(_.position[0],_.position[0]);
+
+        } else if (key === 'En') {
+
             _.lang === 'en' ? _.lang = 'ru' : _.lang = 'en';
             _.k_key_light('Lang')
+
         } else if (key === 'Shift'){
+
             _.shift = !_.shift;
             document.querySelector(`.${code}`).classList.toggle('active');
+
         } else if (key === 'Caps'){
+
             _.caps = !_.caps;
             document.querySelector(`.${code}`).classList.toggle('active');
+
         } else if (key === 'Enter') {
+
             let symbol = `\n`;
-            _.area.value += symbol;
+            _.area.value = strArr[0] + symbol + strArr[2];
+            _.position[0]++; _.position[1]++;
+            _.area.setSelectionRange(_.position[0],_.position[0]);
+
         } else if (_.lang === 'ru') {
+
             let symbol = button.ruKey ? button.ruKey : button.key;
             if (_.shift && button.ruShift) symbol = button.ruShift;
             else if (_.shift && button.shift) symbol = button.shift;
             _.area.value += symbol;
+
         } else {
+
             let symbol = (_.shift && button.shift) ? button.shift : key;
             symbol = (_.shift || _.caps) ? symbol.toUpperCase() : symbol;
-            _.area.value += symbol;
+            _.area.value = strArr[0] + symbol + strArr[2];
+            _.position[0]++; _.position[1]++;
+            _.area.setSelectionRange(_.position[0],_.position[0]);
+
         }
+
+        console.log('test');
         _.area.focus();
         _.k_key_light(code);
+        _.keyBoardButtonsRename(key);
 
+    }
+    keyBoardButtonsRename(key){
+        const _ = this;
         document.querySelectorAll('.keyboard button').forEach(function (el) {
             let name = el.className.split(' ')[0];
-            if (key === 'Ru'){
+
+            if (key === 'En'){
                 if (_.lang === 'ru'){
-                    if (_.buttons[name].ruKey) el.textContent = _.buttons[name].ruKey;
-                    if (_.caps || _.shift) el.textContent = el.textContent.toUpperCase();
+                    _.buttons[name].ruKey ? el.textContent = _.buttons[name].ruKey : '';
+                    if (_.caps || _.shift){
+                        if (!_.buttons[name].appointment) el.textContent = el.textContent.toUpperCase();
+                    }
                     if (_.shift && _.buttons[name].ruShift) el.textContent = _.buttons[name].ruShift
                 } else {
                     el.textContent = _.buttons[name].key;
-                    if (_.caps || _.shift) el.textContent = el.textContent.toUpperCase();
+                    if (_.caps || _.shift){
+                        if (!_.buttons[name].appointment) el.textContent = el.textContent.toUpperCase();
+                    }
                     if (_.shift && _.buttons[name].shift) el.textContent = _.buttons[name].shift
                 }
             }
+
             if (key === 'Shift'){
                 if (_.shift){
-                    if (_.lang === 'en' && _.buttons[name].shift){
-                        el.textContent = _.buttons[name].shift
-                    } else if (_.lang === 'ru' && _.buttons[name].ruShift){
-                        el.textContent = _.buttons[name].ruShift
+                    if (_.lang === 'en'){
+                        _.buttons[name].shift ? el.textContent = _.buttons[name].shift : '';
+                    } else if (_.lang === 'ru'){
+                        if (_.buttons[name].ruShift) el.textContent = _.buttons[name].ruShift;
+                        else if (!_.buttons[name].ruShift && _.buttons[name].shift) el.textContent = _.buttons[name].shift
                     }
                 } else {
                     if (_.lang === 'en'){
@@ -138,16 +186,19 @@ class Keyboard {constructor() {const _ = this;
                     }
                 }
             }
+
             if (key === 'Caps' || key === 'Shift'){
                 if (_.caps || _.shift){
-                    el.textContent = el.textContent.toUpperCase();
-                } else el.textContent = el.textContent.toLowerCase();
+                    if (!_.buttons[name].appointment) el.textContent = el.textContent.toUpperCase();
+                } else {
+                    if (!_.buttons[name].appointment) el.textContent = el.textContent.toLowerCase();
+                }
             }
         })
     }
     keyBoardHandlers(){
         const _ = this;
-        document.querySelector("#input").addEventListener('click',function (e) {
+        document.addEventListener('mouseup',function (e) {
             _.getPosition();
         });
         document.querySelectorAll('.keyboard button').forEach(function (button) {
@@ -159,36 +210,21 @@ class Keyboard {constructor() {const _ = this;
             });
         });
         _.area.addEventListener('keydown',function (e) {
-            if (_.buttons[e.code]) e.preventDefault();
+            if (_.buttons[e.code]){
+                e.preventDefault();
+            }
             _.buttonAction(e.code);
             _.getPosition();
         });
     }
 
-
-    getCaretPos(input){
-        input.focus();
-
-        if(input.selectionStart) return input.selectionStart;
-        else if (document.selection){
-            let sel = document.selection.createRange();
-            let clone = sel.duplicate();
-            sel.collapse(true);
-            clone.moveToElementText(input);
-            clone.setEndPoint('EndToEnd', sel);
-            return clone.text.length;
-        }
-
-        return 0;
-    }
     getPosition() {
         const _ = this;
-        _.position = _.getCaretPos(document.getElementById('input'));
-        setTimeout(function (e) {
-            _.getPosition();
-        }, 100);
+        let input = document.getElementById('input');
+        input.focus();
+        _.position[0] = input.selectionStart;
+        _.position[1] = input.selectionEnd;
     }
-
 
     createButtons(){
         const _ = this;
@@ -219,6 +255,9 @@ class Keyboard {constructor() {const _ = this;
         _.createKeyboardTemp();
         _.createButtons();
         _.keyBoardHandlers();
+        setInterval(function (e) {
+            _.getPosition();
+        },100);
     }
 }
 
